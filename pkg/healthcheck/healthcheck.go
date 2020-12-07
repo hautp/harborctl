@@ -26,7 +26,12 @@ func HealthCheck(url string) {
 		rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
 		t.AppendHeader(table.Row{"Service", "Status"})
 		for i := range components {
-			t.AppendRow(table.Row{components[i].Name, components[i].Status}, rowConfigAutoMerge)
+			t.AppendRow(
+				table.Row{
+					components[i].Name,
+					components[i].Status,
+				},
+				rowConfigAutoMerge)
 		}
 		t.SetColumnConfigs([]table.ColumnConfig{{Number: 1, AutoMerge: true}})
 		t.SetStyle(table.StyleLight)
