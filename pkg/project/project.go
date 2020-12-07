@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	middle "harborctl/pkg/middleware"
-	"log"
+	"os"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/viper"
 )
 
 func ListProjects(url string) {
 	var (
 		hp       HarborProject
-		msg      string
 		username string = viper.GetString("USERNAME")
 		password string = viper.GetString("PASSWORD")
 		pj_url   string = fmt.Sprintf("%s/api/v2.0/projects?page=1&page_size=10", url)
@@ -20,18 +20,27 @@ func ListProjects(url string) {
 
 	projects := middle.GetAPI(pj_url, username, password)
 	json.Unmarshal([]byte(projects), &hp)
-	msg = fmt.Sprintf("[Harbor] List projects:\n")
-	for n, p := range hp {
-		msg += fmt.Sprintf("%d/ Project: %s (id: %d)\nOwner: %s (id: %d)\nPublic: %s\nTotal: %d repositories\n\n",
-			n+1,
-			p.Name,
-			p.ProjectID,
-			p.OwnerName,
-			p.OwnerID,
-			p.Metadata["public"],
-			p.RepoCount)
+	if len(hp) != 0 {
+		t := table.NewWriter()
+		rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+		t.AppendHeader(table.Row{"Project Name", "Owner", "Public", "Total repository"})
+		for _, p := range hp {
+			t.AppendRow(
+				table.Row{
+					fmt.Sprintf("%s (id: %d)", p.Name, p.ProjectID),
+					fmt.Sprintf("%s (id: %d)", p.OwnerName, p.OwnerID),
+					p.Metadata["public"],
+					p.RepoCount},
+				rowConfigAutoMerge,
+			)
+		}
+		t.SetColumnConfigs([]table.ColumnConfig{{Number: 1, AutoMerge: true}})
+		t.SetAutoIndex(true)
+		t.SetStyle(table.StyleLight)
+		t.SetOutputMirror(os.Stdout)
+		t.Style().Options.SeparateRows = true
+		t.Render()
 	}
-	fmt.Println(msg)
 }
 
 func GetProject(url string, project string) {
@@ -72,7 +81,8 @@ func GetTotalRepo(url string, project string) (total int) {
 	json.Unmarshal([]byte(projects), &hp)
 
 	if len(hp) == 0 {
-		log.Fatalln("Could not get total repository.")
+		fmt.Printf("[!] Something went wrong. Could not get repository of project \"%[1]s\". Please check the project name again.\n", project)
+		os.Exit(1)
 	} else {
 		for i := range hp {
 			total = hp[i].RepoCount
