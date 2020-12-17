@@ -5,7 +5,6 @@ import (
 	pj "harborctl/pkg/project"
 	rp "harborctl/pkg/repository"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,8 +34,9 @@ $ %[1]s get tags <REPOSITORY_NAME> # Get artifacts of <REPOSITORY_NAME>
 				os.Exit(0)
 			}
 
+			switch args[0] {
 			// Project section
-			if strings.Contains(args[0], "project") {
+			case "project":
 				if len(args) == 1 {
 					pj.ListProjects(viper.GetString("URL"))
 				} else if len(args) == 2 {
@@ -44,9 +44,8 @@ $ %[1]s get tags <REPOSITORY_NAME> # Get artifacts of <REPOSITORY_NAME>
 				} else {
 					fmt.Println("[!] Do not support to get multiple projects.")
 				}
-
-				// Repository section
-			} else if strings.Contains(args[0], "repo") {
+			// Repository section
+			case "repo":
 				if len(args) == 1 {
 					fmt.Println("[!] Please input project name to get repository.")
 				} else if len(args) == 2 {
@@ -54,9 +53,8 @@ $ %[1]s get tags <REPOSITORY_NAME> # Get artifacts of <REPOSITORY_NAME>
 				} else {
 					fmt.Println("[!] Do not support to get multiple repositories.")
 				}
-
-				// Artifact section
-			} else if strings.Contains(args[0], "tags") {
+			// Artifacts section
+			case "tags":
 				if len(args) == 1 {
 					fmt.Println("[!] Please input repository name to get artifacts.")
 				} else if len(args) == 2 {
@@ -64,9 +62,8 @@ $ %[1]s get tags <REPOSITORY_NAME> # Get artifacts of <REPOSITORY_NAME>
 				} else {
 					fmt.Println("[!] Do not support to get artifacts on multiple repositories.")
 				}
-
-				// Exception
-			} else {
+			// Exceptions
+			default:
 				fmt.Printf("[!] Resource \"%s\" not found.\n", args[0])
 			}
 		},
