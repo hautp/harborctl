@@ -2,18 +2,17 @@ package cmd
 
 import (
 	"fmt"
-	pj "harborctl/pkg/project"
-	rp "harborctl/pkg/repository"
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
 	getCmd = &cobra.Command{
-		Use:   "get",
-		Short: "Display one or many resources",
+		Use:       "get",
+		Short:     "Display one or many resources",
+		Args:      cobra.OnlyValidArgs,
+		ValidArgs: []string{"project", "repo", "tags"},
 		Run: func(cmd *cobra.Command, args []string) {
 
 			// Check len(args)
@@ -32,39 +31,6 @@ $ %[1]s get tags <REPOSITORY_NAME> # Get artifacts of <REPOSITORY_NAME>
 
 `, rootCmd.Use)
 				os.Exit(0)
-			}
-
-			switch args[0] {
-			// Project section
-			case "project":
-				if len(args) == 1 {
-					pj.ListProjects(viper.GetString("URL"))
-				} else if len(args) == 2 {
-					pj.GetProject(viper.GetString("URL"), args[1])
-				} else {
-					fmt.Println("[!] Do not support to get multiple projects.")
-				}
-			// Repository section
-			case "repo":
-				if len(args) == 1 {
-					fmt.Println("[!] Please input project name to get repository.")
-				} else if len(args) == 2 {
-					rp.ListRepositories(viper.GetString("URL"), args[1])
-				} else {
-					fmt.Println("[!] Do not support to get multiple repositories.")
-				}
-			// Artifacts section
-			case "tags":
-				if len(args) == 1 {
-					fmt.Println("[!] Please input repository name to get artifacts.")
-				} else if len(args) == 2 {
-					rp.ListArtifactsToTable(viper.GetString("URL"), args[1])
-				} else {
-					fmt.Println("[!] Do not support to get artifacts on multiple repositories.")
-				}
-			// Exceptions
-			default:
-				fmt.Printf("[!] Resource \"%s\" not found.\n", args[0])
 			}
 		},
 	}
