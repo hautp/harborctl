@@ -29,6 +29,12 @@ $ %[1]s get repo <PROJECT_NAME> # Get all repositories of <PROJECT_NAME>
 # Artifact
 $ %[1]s get tags <REPOSITORY_NAME> # Get artifacts of <REPOSITORY_NAME>
 
+# All users
+$ %[1]s get users # Get all user of registry
+
+# Get a user
+$ %[1]s get user <USERNAME> # Get information of <USERNAME>
+
 `, rootCmd.Use)
 				os.Exit(0)
 			}
